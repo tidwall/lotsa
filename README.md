@@ -12,7 +12,7 @@ go get -u github.com/tidwall/lotsa
 
 ```
 var total int64
-lotsa.Ops(1000000, 4, os.Stdout, 
+lotsa.Ops(1000000, 4,
     func(i, thread int) {
         atomic.AddInt64(&total, 1)
     },
