@@ -1,11 +1,6 @@
 package lotsa
 
-import (
-	"fmt"
-	"io"
-	"sync"
-	"time"
-)
+import "sync"
 
 // Ops executed a number of operations over a multiple goroutines.
 // count is the number of operations.
