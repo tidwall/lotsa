@@ -10,13 +10,8 @@ import (
 // Ops executed a number of operations over a multiple goroutines.
 // count is the number of operations.
 // threads is the number goroutines.
-// output is a writer that will be used to print the results.
 // op is the operation function
-func Ops(count, threads int, output io.Writer, op func(i, thread int)) {
-	var start time.Time
-	if output != nil {
-		start = time.Now()
-	}
+func Ops(count, threads int, op func(i, thread int)) {
 	var wg sync.WaitGroup
 	wg.Add(threads)
 	for i := 0; i < threads; i++ {
@@ -32,23 +27,4 @@ func Ops(count, threads int, output io.Writer, op func(i, thread int)) {
 		}(i, s, e)
 	}
 	wg.Wait()
-	if output != nil {
-		dur := time.Since(start)
-		tp := "s"
-		if threads == 1 {
-			tp = ""
-		}
-		fmt.Fprintf(output, "%s ops over %d thread%s in %s (%s ops/sec)\n",
-			commaize(count), threads, tp, dur, commaize(int(float64(count)/dur.Seconds())))
-	}
-}
-func commaize(n int) string {
-	nstr1, nstr := fmt.Sprintf("%d", n), ""
-	for i, j := len(nstr1)-1, 0; i >= 0; i, j = i-1, j+1 {
-		nstr = string(nstr1[i]) + nstr
-		if i != 0 && j%3 == 2 {
-			nstr = "," + nstr
-		}
-	}
-	return nstr
 }
