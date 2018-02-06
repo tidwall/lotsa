@@ -11,7 +11,7 @@ func Ops(count, threads int, op func(i, thread int)) {
 	wg.Add(threads)
 	for i := 0; i < threads; i++ {
 		s, e := count/threads*i, count/threads*(i+1)
-		if e > count {
+		if i == threads-1 {
 			e = count
 		}
 		go func(i, s, e int) {
