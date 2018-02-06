@@ -10,6 +10,8 @@ go get -u github.com/tidwall/lotsa
 
 ## Example
 
+Here we load 1,000,000 operations spread over 4 threads.
+
 ```
 var total int64
 lotsa.Ops(1000000, 4,
