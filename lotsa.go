@@ -37,8 +37,19 @@ func Ops(count, threads int, op func(i, thread int)) {
 	wg.Wait()
 	if output != nil {
 		dur := time.Since(start)
-		fmt.Fprintf(output, "%d ops over %d threads in %.0fms %.0f/sec\n",
-			count, threads, dur.Seconds()*1000, float64(count)/dur.Seconds())
-
+		fmt.Fprintf(output, "%s ops over %d threads in %.0fms %s/sec\n",
+			commaize(count), threads, dur.Seconds()*1000,
+			commaize(int(float64(count)/dur.Seconds())))
 	}
+}
+
+func commaize(n int) string {
+	s1, s2 := fmt.Sprintf("%d", n), ""
+	for i, j := len(s1)-1, 0; i >= 0; i, j = i-1, j+1 {
+		if j%3 == 0 && j != 0 {
+			s2 = "," + s2
+		}
+		s2 = string(s1[i]) + s2
+	}
+	return s2
 }
