@@ -28,10 +28,10 @@ func Ops(count, threads int, op func(i, thread int)) {
 			e = count
 		}
 		go func(i, s, e int) {
+			defer wg.Done()
 			for j := s; j < e; j++ {
 				op(j, i)
 			}
-			wg.Done()
 		}(i, s, e)
 	}
 	wg.Wait()
