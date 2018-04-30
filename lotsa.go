@@ -41,10 +41,14 @@ func Ops(count, threads int, op func(i, thread int)) {
 		if threads != 1 {
 			ss = fmt.Sprintf("over %d threads ", threads)
 		}
-		fmt.Fprintf(output, "%s ops %sin %.0fms %s/sec [%d ns/op]\n",
+		var nsop int
+		if count > 0 {
+			nsop = int(dur / time.Duration(count))
+		}
+		fmt.Fprintf(output, "%s ops %sin %.0fms, %s/sec, %d ns/op\n",
 			commaize(count), ss, dur.Seconds()*1000,
 			commaize(int(float64(count)/dur.Seconds())),
-			dur/time.Duration(count),
+			nsop,
 		)
 	}
 }
