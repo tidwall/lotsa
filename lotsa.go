@@ -36,20 +36,7 @@ func Ops(count, threads int, op func(i, thread int)) {
 	}
 	wg.Wait()
 	if output != nil {
-		dur := time.Since(start)
-		var ss string
-		if threads != 1 {
-			ss = fmt.Sprintf("over %d threads ", threads)
-		}
-		var nsop int
-		if count > 0 {
-			nsop = int(dur / time.Duration(count))
-		}
-		fmt.Fprintf(output, "%s ops %sin %.0fms, %s/sec, %d ns/op\n",
-			commaize(count), ss, dur.Seconds()*1000,
-			commaize(int(float64(count)/dur.Seconds())),
-			nsop,
-		)
+		WriteOutput(output, count, threads, time.Since(start))
 	}
 }
 
@@ -62,4 +49,21 @@ func commaize(n int) string {
 		s2 = string(s1[i]) + s2
 	}
 	return s2
+}
+
+// WriteOutput writes an output line to the specified writer
+func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration) {
+	var ss string
+	if threads != 1 {
+		ss = fmt.Sprintf("over %d threads ", threads)
+	}
+	var nsop int
+	if count > 0 {
+		nsop = int(elapsed / time.Duration(count))
+	}
+	fmt.Fprintf(w, "%s ops %sin %.0fms, %s/sec, %d ns/op\n",
+		commaize(count), ss, elapsed.Seconds()*1000,
+		commaize(int(float64(count)/elapsed.Seconds())),
+		nsop,
+	)
 }
