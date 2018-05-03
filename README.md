@@ -38,7 +38,7 @@ lotsa.Ops(1000000, 4,
 
 Prints: 
 
-```go
+```
 1,000,000 ops over 4 threads in 23ms, 43,580,037/sec, 22 ns/op
 ```
 
