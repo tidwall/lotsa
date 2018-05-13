@@ -22,12 +22,12 @@ func Ops(count, threads int, op func(i, thread int)) {
 	var start time.Time
 	var wg sync.WaitGroup
 	wg.Add(threads)
-	var ms runtime.MemStats
+	var ms1 runtime.MemStats
 	output := Output
 	if output != nil {
 		if MemUsage {
 			runtime.GC()
-			runtime.ReadMemStats(&ms)
+			runtime.ReadMemStats(&ms1)
 		}
 		start = time.Now()
 	}
@@ -48,10 +48,9 @@ func Ops(count, threads int, op func(i, thread int)) {
 		dur := time.Since(start)
 		var alloc uint64
 		if MemUsage {
-			runtime.GC()
 			var ms2 runtime.MemStats
 			runtime.ReadMemStats(&ms2)
-			alloc = ms2.HeapAlloc - ms.HeapAlloc
+			alloc = ms2.HeapAlloc - ms1.HeapAlloc
 		}
 		WriteOutput(output, count, threads, dur, alloc)
 	}
