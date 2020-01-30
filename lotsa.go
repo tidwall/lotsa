@@ -38,18 +38,12 @@ func Ops(count, threads int, op func(i, thread int)) {
 		}
 		go func(i, s, e int) {
 			defer wg.Done()
-			if e == count {
-				e--
-			}
 			for j := s; j < e; j++ {
 				op(j, i)
 			}
 		}(i, s, e)
 	}
 	wg.Wait()
-	if count > 0 {
-		op(count-1, 0)
-	}
 
 	if output != nil {
 		dur := time.Since(start)
