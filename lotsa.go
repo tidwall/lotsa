@@ -49,9 +49,14 @@ func Ops(count, threads int, op func(i, thread int)) {
 		dur := time.Since(start)
 		var alloc uint64
 		if MemUsage {
+			runtime.GC()
 			var ms2 runtime.MemStats
 			runtime.ReadMemStats(&ms2)
-			alloc = ms2.HeapAlloc - ms1.HeapAlloc
+			if ms1.HeapAlloc > ms2.HeapAlloc {
+				alloc = 0
+			} else {
+				alloc = ms2.HeapAlloc - ms1.HeapAlloc
+			}
 		}
 		WriteOutput(output, count, threads, dur, alloc)
 	}
