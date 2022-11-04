@@ -98,11 +98,11 @@ func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration, alloc u
 	}
 	var allocstr string
 	if alloc > 0 {
-		var bops uint64
+		var bops float64
 		if count > 0 {
-			bops = alloc / uint64(count)
+			bops = float64(alloc) / float64(count)
 		}
-		allocstr = fmt.Sprintf(", %s, %d bytes/op", memstr(alloc), bops)
+		allocstr = fmt.Sprintf(", %s, %.1f bytes/op", memstr(alloc), bops)
 	}
 	fmt.Fprintf(w, "%s ops %sin %.0fms, %s/sec, %d ns/op%s\n",
 		commaize(count), ss, elapsed.Seconds()*1000,
