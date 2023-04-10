@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Output is used to print elased time and ops/sec
+// Output is used to print elapsed time and ops/sec
 var Output io.Writer
 
 // MemUsage is used to output the memory usage
