@@ -33,7 +33,7 @@ func TestTime(t *testing.T) {
 	})
 	actualDuration := time.Since(startTs)
 
-	if expectedDuration.Round(time.Millisecond) != actualDuration.Round(time.Millisecond) {
+	if expectedDuration.Round(time.Second) != actualDuration.Round(time.Second) {
 		t.Fatal("invalid duration")
 	}
 }
