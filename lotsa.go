@@ -3,8 +3,10 @@ package lotsa
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -58,11 +60,71 @@ func Ops(count, threads int, op func(i, thread int)) {
 				alloc = ms2.HeapAlloc - ms1.HeapAlloc
 			}
 		}
+		WriteOutput(output, int64(count), threads, dur, alloc)
+	}
+}
+
+// Time executed operations over multiple goroutines for a fixed duration.
+// duration is the duration for continuously running the Operation.
+// threads is the number goroutines.
+// op is the operation function
+func Time(duration time.Duration, threads int, op func(threadRand *rand.Rand, thread int)) {
+
+	var start time.Time
+	var wg sync.WaitGroup
+	wg.Add(threads)
+	var ms1 runtime.MemStats
+	output := Output
+	if output != nil {
+		if MemUsage {
+			runtime.GC()
+			runtime.ReadMemStats(&ms1)
+		}
+		start = time.Now()
+	}
+
+	var count int64
+	for i := 0; i < threads; i++ {
+
+		go func(i int) {
+			threadRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+			done := time.After(duration)
+			var localCount int64 = 0
+			for {
+				select {
+				case <-done:
+					wg.Done()
+					atomic.AddInt64(&count, localCount)
+					return
+				default:
+					{
+						op(threadRand, i)
+						localCount++
+					}
+				}
+			}
+		}(i)
+	}
+	wg.Wait()
+
+	if output != nil {
+		dur := time.Since(start)
+		var alloc uint64
+		if MemUsage {
+			runtime.GC()
+			var ms2 runtime.MemStats
+			runtime.ReadMemStats(&ms2)
+			if ms1.HeapAlloc > ms2.HeapAlloc {
+				alloc = 0
+			} else {
+				alloc = ms2.HeapAlloc - ms1.HeapAlloc
+			}
+		}
 		WriteOutput(output, count, threads, dur, alloc)
 	}
 }
 
-func commaize(n int) string {
+func commaize(n int64) string {
 	s1, s2 := fmt.Sprintf("%d", n), ""
 	for i, j := len(s1)-1, 0; i >= 0; i, j = i-1, j+1 {
 		if j%3 == 0 && j != 0 {
@@ -87,7 +149,7 @@ func memstr(alloc uint64) string {
 }
 
 // WriteOutput writes an output line to the specified writer
-func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration, alloc uint64) {
+func WriteOutput(w io.Writer, count int64, threads int, elapsed time.Duration, alloc uint64) {
 	var ss string
 	if threads != 1 {
 		ss = fmt.Sprintf("over %d threads ", threads)
@@ -106,7 +168,7 @@ func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration, alloc u
 	}
 	fmt.Fprintf(w, "%s ops %sin %.0fms, %s/sec, %d ns/op%s\n",
 		commaize(count), ss, elapsed.Seconds()*1000,
-		commaize(int(float64(count)/elapsed.Seconds())),
+		commaize(int64(float64(count)/elapsed.Seconds())),
 		nsop, allocstr,
 	)
 }
