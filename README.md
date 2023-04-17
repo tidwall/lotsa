@@ -22,6 +22,9 @@ Prints:
 654,330 ops over 4 threads in 24ms, 27,207,775/sec, 36 ns/op
 ```
 
+---
+
+
 # lotsa
 
 Lotsa is a simple Go library for executing lots of operations spread over any number of threads.
