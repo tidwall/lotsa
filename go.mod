@@ -1,3 +1,3 @@
-module github.com/tidwall/lotsa
+module github.com/arjunsk/lotsaa
 
 go 1.19
