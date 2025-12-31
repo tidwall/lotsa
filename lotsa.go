@@ -92,9 +92,9 @@ func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration, alloc u
 	if threads != 1 {
 		ss = fmt.Sprintf("over %d threads ", threads)
 	}
-	var nsop int
+	var nsop float64
 	if count > 0 {
-		nsop = int(elapsed / time.Duration(count))
+		nsop = float64(elapsed) / float64(time.Duration(count))
 	}
 	var allocstr string
 	if alloc > 0 {
@@ -104,9 +104,15 @@ func WriteOutput(w io.Writer, count, threads int, elapsed time.Duration, alloc u
 		}
 		allocstr = fmt.Sprintf(", %s, %.1f bytes/op", memstr(alloc), bops)
 	}
-	fmt.Fprintf(w, "%s ops %sin %.0fms, %s/sec, %d ns/op%s\n",
+	var snsop string
+	if nsop < 10 {
+		snsop = fmt.Sprintf("%0.1f", nsop)
+	} else {
+		snsop = fmt.Sprintf("%0.0f", nsop)
+	}
+	fmt.Fprintf(w, "%s ops %sin %.0fms, %s/sec, %s ns/op%s\n",
 		commaize(count), ss, elapsed.Seconds()*1000,
 		commaize(int(float64(count)/elapsed.Seconds())),
-		nsop, allocstr,
+		snsop, allocstr,
 	)
 }
