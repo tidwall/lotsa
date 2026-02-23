@@ -31,17 +31,20 @@ func Ops(count, threads int, op func(i, thread int)) {
 		}
 		start = time.Now()
 	}
+	group := func(i, s, e int) {
+		defer wg.Done()
+		for j := s; j < e; j++ {
+			op(j, i)
+		}
+	}
 	for i := 0; i < threads; i++ {
 		s, e := count/threads*i, count/threads*(i+1)
 		if i == threads-1 {
 			e = count
+			group(i, s, e)
+		} else {
+			go group(i, s, e)
 		}
-		go func(i, s, e int) {
-			defer wg.Done()
-			for j := s; j < e; j++ {
-				op(j, i)
-			}
-		}(i, s, e)
 	}
 	wg.Wait()
 
